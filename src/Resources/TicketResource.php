@@ -145,7 +145,7 @@ class TicketResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('assignee.name')
+                Tables\Columns\TextColumn::make('assignee.ticketable_name')
                     ->label(__('escalated-filament::filament.resources.ticket.column_assigned_to'))
                     ->sortable()
                     ->default(__('escalated-filament::filament.resources.ticket.default_unassigned'))
@@ -208,7 +208,7 @@ class TicketResource extends Resource
 
                 Tables\Filters\SelectFilter::make('assigned_to')
                     ->label(__('escalated-filament::filament.resources.ticket.filter_assigned_agent'))
-                    ->options(fn () => app(Escalated::userModel())::pluck('name', 'id'))
+                    ->relationship('assignee', 'ticketable_name')
                     ->searchable(),
 
                 Tables\Filters\SelectFilter::make('tags')
@@ -239,7 +239,7 @@ class TicketResource extends Resource
                     ->form([
                         Forms\Components\Select::make('agent_id')
                             ->label(__('escalated-filament::filament.actions.assign_ticket.agent_field'))
-                            ->options(fn () => app(Escalated::userModel())::pluck('name', 'id'))
+                            ->relationship('assignee', 'ticketable_name')
                             ->searchable()
                             ->required(),
                     ])

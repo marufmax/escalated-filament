@@ -78,7 +78,10 @@ class TicketResource extends Resource
 
                         Forms\Components\Select::make('assigned_to')
                             ->label(__('escalated-filament::filament.resources.ticket.field_assigned_agent'))
-                            ->options(fn () => app(Escalated::userModel())::pluck('name', 'id'))
+                            ->relationship(
+                                name: 'assignee',
+                                titleAttribute: 'ticketable_name',
+                            )
                             ->searchable()
                             ->nullable(),
 

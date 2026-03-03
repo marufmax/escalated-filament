@@ -2,29 +2,36 @@
 
 namespace Escalated\Filament\Resources\TicketResource\Pages;
 
+use Escalated\Filament\Livewire\SatisfactionRating;
+use Escalated\Filament\Livewire\TicketConversation;
 use Escalated\Filament\Resources\TicketResource;
 use Escalated\Laravel\Enums\TicketPriority;
 use Escalated\Laravel\Enums\TicketStatus;
 use Escalated\Laravel\Escalated;
 use Escalated\Laravel\Models\Macro;
 use Escalated\Laravel\Models\Ticket;
+use Escalated\Laravel\Services\TicketService;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Livewire;
+use Filament\Schemas\Schema;
 
 class ViewTicket extends ViewRecord
 {
     protected static string $resource = TicketResource::class;
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                Infolists\Components\Group::make([
-                    Infolists\Components\Section::make(__('escalated-filament::filament.resources.ticket.section_ticket_info'))
+                Group::make([
+                    Section::make(__('escalated-filament::filament.resources.ticket.section_ticket_info'))
                         ->schema([
                             Infolists\Components\TextEntry::make('reference')
                                 ->label(__('escalated-filament::filament.resources.ticket.field_reference'))
@@ -48,17 +55,17 @@ class ViewTicket extends ViewRecord
                         ])
                         ->columns(2),
 
-                    Infolists\Components\Section::make(__('escalated-filament::filament.resources.ticket.section_conversation'))
+                    Section::make(__('escalated-filament::filament.resources.ticket.section_conversation'))
                         ->schema([
-                            Infolists\Components\Livewire::make(
-                                \Escalated\Filament\Livewire\TicketConversation::class,
+                            Livewire::make(
+                                TicketConversation::class,
                                 fn (Ticket $record) => ['ticketId' => $record->id]
                             )->columnSpanFull(),
                         ]),
                 ])->columnSpan(2),
 
-                Infolists\Components\Group::make([
-                    Infolists\Components\Section::make(__('escalated-filament::filament.resources.ticket.section_details'))
+                Group::make([
+                   Section::make(__('escalated-filament::filament.resources.ticket.section_details'))
                         ->schema([
                             Infolists\Components\TextEntry::make('status')
                                 ->badge()
@@ -100,7 +107,7 @@ class ViewTicket extends ViewRecord
                                 ->label(__('escalated-filament::filament.resources.ticket.field_requester_email')),
                         ]),
 
-                    Infolists\Components\Section::make(__('escalated-filament::filament.resources.ticket.section_sla'))
+                    Section::make(__('escalated-filament::filament.resources.ticket.section_sla'))
                         ->schema([
                             Infolists\Components\TextEntry::make('slaPolicy.name')
                                 ->label(__('escalated-filament::filament.resources.ticket.field_sla_policy'))
@@ -139,7 +146,7 @@ class ViewTicket extends ViewRecord
                         ])
                         ->collapsible(),
 
-                    Infolists\Components\Section::make(__('escalated-filament::filament.resources.ticket.section_tags'))
+                    Section::make(__('escalated-filament::filament.resources.ticket.section_tags'))
                         ->schema([
                             Infolists\Components\RepeatableEntry::make('tags')
                                 ->schema([
@@ -152,16 +159,16 @@ class ViewTicket extends ViewRecord
                         ])
                         ->collapsible(),
 
-                    Infolists\Components\Section::make(__('escalated-filament::filament.resources.ticket.section_satisfaction'))
+                    Section::make(__('escalated-filament::filament.resources.ticket.section_satisfaction'))
                         ->schema([
-                            Infolists\Components\Livewire::make(
-                                \Escalated\Filament\Livewire\SatisfactionRating::class,
+                           Livewire::make(
+                                SatisfactionRating::class,
                                 fn (Ticket $record) => ['ticketId' => $record->id]
                             )->columnSpanFull(),
                         ])
                         ->collapsible(),
 
-                    Infolists\Components\Section::make(__('escalated-filament::filament.resources.ticket.section_timestamps'))
+                    Section::make(__('escalated-filament::filament.resources.ticket.section_timestamps'))
                         ->schema([
                             Infolists\Components\TextEntry::make('created_at')
                                 ->label(__('escalated-filament::filament.resources.ticket.field_created'))
@@ -200,7 +207,7 @@ class ViewTicket extends ViewRecord
                         ->required(),
                 ])
                 ->action(function (array $data): void {
-                    app(\Escalated\Laravel\Services\TicketService::class)
+                    app(TicketService::class)
                         ->reply($this->record, auth()->user(), $data['body']);
 
                     Notification::make()
@@ -219,7 +226,7 @@ class ViewTicket extends ViewRecord
                         ->required(),
                 ])
                 ->action(function (array $data): void {
-                    app(\Escalated\Laravel\Services\TicketService::class)
+                    app(TicketService::class)
                         ->addNote($this->record, auth()->user(), $data['body']);
 
                     Notification::make()
@@ -261,7 +268,7 @@ class ViewTicket extends ViewRecord
                         ->required(),
                 ])
                 ->action(function (array $data): void {
-                    app(\Escalated\Laravel\Services\TicketService::class)
+                    app(TicketService::class)
                         ->changeStatus($this->record, TicketStatus::from($data['status']), auth()->user());
 
                     Notification::make()
@@ -282,7 +289,7 @@ class ViewTicket extends ViewRecord
                         ->required(),
                 ])
                 ->action(function (array $data): void {
-                    app(\Escalated\Laravel\Services\TicketService::class)
+                    app(TicketService::class)
                         ->changePriority($this->record, TicketPriority::from($data['priority']), auth()->user());
 
                     Notification::make()
@@ -336,7 +343,7 @@ class ViewTicket extends ViewRecord
                 ->color('success')
                 ->requiresConfirmation()
                 ->action(function (): void {
-                    app(\Escalated\Laravel\Services\TicketService::class)
+                    app(TicketService::class)
                         ->resolve($this->record, auth()->user());
 
                     Notification::make()
@@ -352,7 +359,7 @@ class ViewTicket extends ViewRecord
                 ->color('danger')
                 ->requiresConfirmation()
                 ->action(function (): void {
-                    app(\Escalated\Laravel\Services\TicketService::class)
+                    app(TicketService::class)
                         ->close($this->record, auth()->user());
 
                     Notification::make()
@@ -368,7 +375,7 @@ class ViewTicket extends ViewRecord
                 ->color('info')
                 ->requiresConfirmation()
                 ->action(function (): void {
-                    app(\Escalated\Laravel\Services\TicketService::class)
+                    app(TicketService::class)
                         ->reopen($this->record, auth()->user());
 
                     Notification::make()

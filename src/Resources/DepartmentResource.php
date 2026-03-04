@@ -63,7 +63,7 @@ class DepartmentResource extends Resource
 
                         Forms\Components\Select::make('agents')
                             ->label(__('escalated-filament::filament.resources.department.field_agents'))
-                            ->relationship('agents', 'name')
+                            ->relationship('agents', titleAttribute: Escalated::userDisplayColumn())
                             ->multiple()
                             ->preload()
                             ->searchable(),

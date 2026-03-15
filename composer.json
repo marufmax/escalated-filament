@@ -6,7 +6,7 @@
     "type": "library",
     "require": {
         "php": "^8.2",
-        "escalated-dev/escalated-laravel": "dev-main",
+        "escalated-dev/escalated-laravel": "0.6",
         "filament/filament": "^4.0 || ^5.0"
     },
     "require-dev": {
@@ -22,12 +22,6 @@
             "Escalated\\Filament\\": "src/"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/marufmax/escalated-laravel"
-        }
-    ],
     "autoload-dev": {
         "psr-4": {
             "Escalated\\Filament\\Tests\\": "tests/",
